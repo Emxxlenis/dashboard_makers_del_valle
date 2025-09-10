@@ -177,8 +177,9 @@ export function Dashboard() {
         
         <div className="hidden md:flex md:w-64 md:flex-col">
           <div className="flex flex-col flex-grow pt-5 overflow-y-auto bg-card border-r">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
+            <div className="flex items-center flex-shrink-0 px-4 space-x-2">
+              <img src="/logo.svg" alt="Logo" className="h-6 w-6" />
+              <span className="text-xl font-bold text-foreground">Inventory</span>
             </div>
             <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
           </div>

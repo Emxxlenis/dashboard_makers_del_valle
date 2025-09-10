@@ -1,0 +1,461 @@
+{
+  "name": "chatbot_makers_tech",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "={{ $('makers-tech-bot').first().json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -368
+      ],
+      "id": "15d72433-b71f-400f-bd9a-b4a948e3fcb0",
+      "name": "Send a text message",
+      "webhookId": "6da8dbcd-254d-4450-a64d-45bb9310bda9",
+      "credentials": {
+        "telegramApi": {
+          "id": "6vx6jno6rej6WNCl",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        -400
+      ],
+      "id": "a20a2425-ef86-4eeb-bfc0-b2d72665421c",
+      "name": "makers-tech-bot",
+      "webhookId": "60af9d92-41a7-4f0e-851d-ad2c685e7485",
+      "credentials": {
+        "telegramApi": {
+          "id": "6vx6jno6rej6WNCl",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ghr3MkJgyu6tcfY-lRTgMC3_Gwcc-jPngbzQuf7RnU8",
+          "mode": "list",
+          "cachedResultName": "inventario",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ghr3MkJgyu6tcfY-lRTgMC3_Gwcc-jPngbzQuf7RnU8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ghr3MkJgyu6tcfY-lRTgMC3_Gwcc-jPngbzQuf7RnU8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -224,
+        -400
+      ],
+      "id": "d7ecba43-ee30-4a08-afa8-1604db6bc862",
+      "name": "Get row(s) in sheet4",
+      "credentials": {
+        "googleApi": {
+          "id": "0lVauWhJLHtSiEJS",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -336
+      ],
+      "id": "43722903-c689-4dca-933c-a1b43ebb2a18",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "bFp2ewGY7Jb4KrDr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente de ventas de Makers Tech. Tu objetivo es atender al cliente de manera amigable, natural y profesional, siempre basándote únicamente en el inventario disponible. No inventes productos ni des información fuera del inventario.\n\nReglas de respuesta:\n\nResponde solo con productos que estén en el inventario.\n\nDa respuestas cortas y concisas, pero con buena atención al cliente.\n\nPregunta qué necesita el cliente para poder ayudarlo mejor.\n\nSi el producto que busca no está disponible, ofrece otras opciones del inventario.\n\nSiempre intenta incentivar la compra de manera sutil y amable.\n\nCuando busques un producto en el inventario, no te limites a la palabra exacta; reconoce sinónimos, términos similares o descripciones aproximadas que el cliente pueda usar para referirse al producto.\n\nInventario disponible:\n{{ $('Code in JavaScript4').first().json }}\n\nPregunta del cliente:\n{{ $('makers-tech-bot').first().json.message.text }}\n\nRespuesta:",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        -512
+      ],
+      "id": "4e25071e-df26-410d-9336-6be243847b5f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      inventory: $items().map(item => item.json)\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -384
+      ],
+      "id": "873161c5-d561-4bb0-83a5-4514fe110d7b",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente de ventas de Makers Tech. Tu objetivo es ayudar a un nuevo usuario recomendando los 3 mejores productos del inventario, de manera clara, amigable y profesional.\n\nReglas de respuesta:\n\nRecomendaciones solo con productos que estén en el inventario.\n\nNo inventes productos ni información fuera del inventario.\n\nSé concreto y conciso, destacando características clave de cada producto.\n\nCuando busques productos, reconoce sinónimos, términos similares o descripciones aproximadas que el cliente pueda usar.\n\nIncentiva la compra de manera sutil, mostrando el valor del producto.\n\nFormato de salida:\n\n🔥 RECOMENDACIONES MAKERS TECH\n\n[Producto] - $[Precio]\n[Descripción breve con características clave]\n\n[Producto] - $[Precio]\n[Descripción breve con características clave]\n\n[Producto] - $[Precio]\n[Descripción breve con características clave]\n\nInventario disponible:\n{{ $json }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -80
+      ],
+      "id": "ec4f5705-4bdd-4f84-8c4b-843cb261d0c2",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        608,
+        112
+      ],
+      "id": "8c7b6ad6-62b0-4747-b5a8-482947e77b69",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "bFp2ewGY7Jb4KrDr",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('makers-tech-bot').first().json.message.chat.id }}",
+        "text": "=¡Bienvenido a Makers Tech! 🚀\n\n{{ $json.output }}\n\n💬 Pregúntame sobre cualquier producto escribiendo su nombre o características que buscas.\n",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📱 Smartphones",
+                    "additionalFields": {
+                      "callback_data": "Smartphones"
+                    }
+                  },
+                  {
+                    "text": "💻 Laptops",
+                    "additionalFields": {
+                      "callback_data": "Laptops"
+                    }
+                  },
+                  {
+                    "text": "🎧 Accesorios",
+                    "additionalFields": {
+                      "callback_data": "Accesorios"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        32
+      ],
+      "id": "6b3dbda0-ea2f-480a-8eda-28038ab65cbb",
+      "name": "Send a text message4",
+      "webhookId": "6da8dbcd-254d-4450-a64d-45bb9310bda9",
+      "credentials": {
+        "telegramApi": {
+          "id": "6vx6jno6rej6WNCl",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "491786cc-1af6-4c80-ac2d-db07bda32a00",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -368
+      ],
+      "id": "8871ffa5-4343-4580-83ba-a105f41749d0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ghr3MkJgyu6tcfY-lRTgMC3_Gwcc-jPngbzQuf7RnU8",
+          "mode": "list",
+          "cachedResultName": "inventario",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ghr3MkJgyu6tcfY-lRTgMC3_Gwcc-jPngbzQuf7RnU8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ghr3MkJgyu6tcfY-lRTgMC3_Gwcc-jPngbzQuf7RnU8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        -128
+      ],
+      "id": "c3f41f43-e274-4741-aa03-b7ecc996a04e",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "0lVauWhJLHtSiEJS",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('makers-tech-bot').first().json.message.chat.id }}",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        -288
+      ],
+      "id": "fa67f0c0-a2b5-4739-855d-6931281376de",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('makers-tech-bot').first().json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        112
+      ],
+      "id": "2b3dcee4-6b2d-4e93-b78b-05a8c965b755",
+      "name": "Simple Memory1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "makers-tech-bot": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a09adeea-8171-430c-b73a-e51e9caaf2e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b4a33c355f10ac8e1b8f4e98417a6d8236f56d1356126b4ac0173de7a63ab43e"
+  },
+  "id": "C3padfhnGY0vPRYQ",
+  "tags": []
+}
