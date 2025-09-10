@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "env": {
+    "NEXT_PUBLIC_SHEET_ID": "@next_public_sheet_id",
+    "NEXT_PUBLIC_GOOGLE_API_KEY": "@next_public_google_api_key"
+  }
+}
